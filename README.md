@@ -1,4 +1,4 @@
-## Build Pokemon Sample App with React Native
+## Build MARVEL API DEMO App with React Native
 
 #### Webpack 4 + Babel 7 + React 16
 
