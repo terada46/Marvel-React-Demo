@@ -1,50 +1,33 @@
 const path = require('path');
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-module.exports = {
+let config = {
     entry: './src/js/index.js',
     output: {
         filename: 'main.js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'build')
+    },
+    resolve: {
+        modules: ['node_modules', 'src'],
+        extensions: ['.js', '.css', '.json']
     },
     module: {
         rules: [
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: [
-                                '@babel/preset-env',
-                                '@babel/react'
-                            ]
-                        }
-                    }
-                ]
+                use: 'babel-loader'
             },
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                ]
-            },
-            {
-                test: /\.html$/,
-                use: [
-                    {
-                        loader: "html-loader"
-                    }
-                ]
-            }
         ]
     },
     plugins: [
         new HtmlWebPackPlugin({
             template: "./src/index.html",
-            filename: "./index.html"
-        })
-    ]
+            filename: "index.html"
+        }),
+        new CleanWebpackPlugin(['build/*.*'])
+    ],
 };
+
+module.exports = config;

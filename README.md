@@ -4,6 +4,6 @@
 
 `npm run start`  Run webpack dev Server.
 
-`npm run dev`  Build for development.
+`npm run build`  Build for development.
 
-`npm run build`  Build for production.
+`npm run production`  Build for production.

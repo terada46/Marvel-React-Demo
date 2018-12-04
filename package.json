@@ -6,9 +6,9 @@
   "author": "DENG XIAODONG",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config webpack.build.js",
-    "start": "webpack-dev-server --config webpack.dev.js --open",
-    "dev": "webpack --config webpack.dev.js"
+    "production": "webpack --config webpack.prod.js --progress",
+    "start": "webpack-dev-server --hot --inline --colors --progress --config webpack.dev.js",
+    "build": "webpack --config webpack.dev.js --progress --watch"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
@@ -16,10 +16,16 @@
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
+    "autoprefixer": "^9.3.1",
     "babel-loader": "^8.0.4",
+    "clean-webpack-plugin": "^1.0.0",
+    "css-hot-loader": "^1.4.2",
     "css-loader": "^1.0.1",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.4.5",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "postcss-loader": "^3.0.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.23.1",
     "webpack-cli": "^3.1.2",
