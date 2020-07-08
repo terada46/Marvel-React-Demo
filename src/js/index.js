@@ -2,7 +2,8 @@ import React, { Fragment, Component } from 'react';
 import { render } from 'react-dom';
 import axios from 'axios';
 import CharactersList from './components/CharactersList';
-import LoadableCharacterComponent from './components/LoadableComponent';
+import CharacterMain from './components/CharacterMain'
+import { CharacterListLoader } from './components/ImageLoader';
 import { charactersAPI, apikey, characters, ts, hash } from './constants';
 import '../style.css';
 
@@ -18,41 +19,38 @@ class App extends Component {
 		}
     }
     
-	componentDidMount() {
-		return Promise.all(
-			characters.map(id => {
-				return axios.get( charactersAPI, {
-					params: {
-						ts: ts,
-						apikey: apikey,
-						id: id,
-						hash: hash
+	async componentDidMount() {
+		try {
+			const response = await Promise.all(
+				characters.map(async id => {
+					const res = await axios.get(charactersAPI, {
+						params: {
+							ts: ts,
+							apikey: apikey,
+							id: id,
+							hash: hash
+						}
+					});
+					if (res.status === 200) {
+						return res.data.data.results[0];
 					}
 				})
-				.then(response => {
-					if (response.status === 200) {
-						return response.data.data.results[0];			
-					}
-				})
-			})
-		)
-		.then(response => {
-				if (response.length !== 0) {
-					this.setState(prevState => ({
-						charaArray: [...prevState.charaArray].concat(response)
-					}))
-				}
+			);
+			if (response.length !== 0) {
+				this.setState({
+					charaArray: [...response]
+				});
 			}
-		)
-		.catch(() => {
-			this.setState(() => ({hasError: true}))
-		})
+		}
+		catch (error) {
+			this.setState({ hasError: true });
+		}
 		
 	}
 
-    onCharacterClick = id => {
+    onCharacterClick = (id) => {
         this.setState({
-			selected_id: id
+			selected_id: id,
 		});
     }
 
@@ -63,13 +61,16 @@ class App extends Component {
 		return (
             <Fragment>
                 <p className="guide">Click and View More about the Character.</p>
+				{this.state.charaArray.length === 0 ? <CharacterListLoader /> : null}
                 <CharactersList
                     id={this.state.selected_id} 
-                    characters={this.state.charaArray} 
+                    characters={this.state.charaArray}
                     handleCharacterClick={this.onCharacterClick} 
 				/>
-				{ this.state.selected_id !== null 
-					? <LoadableCharacterComponent id={this.state.selected_id} /> 
+				{this.state.selected_id !== null 
+					? <CharacterMain 
+						id={this.state.selected_id} 
+					  /> 
 					: null }
             </Fragment>
         )

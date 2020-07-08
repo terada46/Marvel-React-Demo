@@ -1,61 +1,55 @@
-import React, { Component } from 'react';
-import { isImagesLoaded, LoadSpinner } from '../functions';
+import React from 'react';
+import ProgressiveImage from 'react-progressive-graceful-image';
+import { CharacterSmallLoader } from './ImageLoader';
+
+const placeholder = (
+    <CharacterSmallLoader />
+);
 
 //Render the list of the characters in gallery
 
-export default class CharactersList extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading:true
-        }
+const CharactersList = ({id, characters, handleCharacterClick}) => {
+    const handleClick = (id) => {
+        handleCharacterClick(id)
     }
-
-    handleClick = id => {
-        this.props.handleCharacterClick(id)
-    }
-
-    handleImageChange = () => {
-        this.setState(() => ({
-            loading: !isImagesLoaded(this.galleryElement)
-        }));
-    }
-
-    renderSpinner = () => {
-        if (!this.state.loading) {
-            return null;
-        }
-        return <LoadSpinner />
-    }
-    
-    render() {
-        let CHARACTERS = this.props.characters;
-        let row = [];
-        if (CHARACTERS.length !== 0) {
-            CHARACTERS.map(CHARACTER => {
-                row.push(
+    const CharactersArray = () => {
+        let list = [];
+        characters.map(CHARACTER => {
+            if (CHARACTER.thumbnail && "path" in CHARACTER.thumbnail) {
+                let { path, extension } = CHARACTER.thumbnail;
+                list.push(
                     <div 
-                        className={"character" + (this.props.id === CHARACTER.id ? ' active' : '')} 
-                        key={CHARACTER.id}>
-                        <img 
-                            onClick={() => this.handleClick(CHARACTER.id)} 
-                            src={CHARACTER.thumbnail.path + 
-                                    '/landscape_small.' + 
-                                    CHARACTER.thumbnail.extension}
-                            onLoad={this.handleImageChange}
-                            onError={this.handleImageChange}
-                        />
+                        className={"character" + (id === CHARACTER.id ? ' active' : '')} 
+                        key={CHARACTER.id}
+                    >
+                        <ProgressiveImage
+                            src={`${path}/landscape_small.${extension}`} 
+                            rootMargin="0% 0% 0%"
+                            threshold={[1]}
+                            placeholder="">
+                            {(src, loading) => {
+                                return loading ? placeholder : 
+                                <img 
+                                    onClick={() => handleClick(CHARACTER.id)} 
+                                    src={src}
+                                    alt={CHARACTER.name}
+                                />
+                            }}
+                        </ProgressiveImage>
                     </div>
                 )
-            })
-        }
-        return (
-            <div id="characters_list" ref={element => {this.galleryElement = element}}>
-                {this.renderSpinner()}
-                <div id="center-characters-list">
-                    {row}
-                </div>
-            </div>
-        )
+            }
+        });
+        return list;
     }
+
+    return (
+        <div id="characters_list">
+            <div id="center-characters-list">
+                {CharactersArray()}
+            </div>
+        </div>
+    )
 }
+
+export default CharactersList;

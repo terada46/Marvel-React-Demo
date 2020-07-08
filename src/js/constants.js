@@ -12,7 +12,8 @@ export const characters = [
 					'1009368', //IRON MAN
 					'1009610', //Spider-man
 					'1009351', //Hulk
-					'1009146', //Abomination
+					// '1009146', //Abomination
+					'1009220', //Captain America
 					'1009297', //Falcon
 					'1009596', //Banshee
 					'1009262', //Daredevil

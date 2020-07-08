@@ -1,71 +1,51 @@
-import React, { Fragment, Component } from 'react';
-import { isImagesLoaded, LoadSpinner } from '../functions';
+import React from 'react';
+import ProgressiveImage from 'react-progressive-graceful-image';
+import { ComicImageLoader } from './ImageLoader';
 
-//Render the comics data in gallery
+const placeholder = (
+    <ComicImageLoader />
+);
 
-export default class ComicRenderer extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading: true,
-        }
+//Render the comics with placeholder
+
+const ComicRenderer = ({comics}) => {
+    if (comics.length === 0) {
+        return <h2 className="error">Can't get comics list.</h2>
     }
-
-    handleImageChange = () => {       
-        this.setState(() => ({
-            loading: !isImagesLoaded(this.comicsElement)
-        }));       
-    }
-
-    renderSpinner = () => {
-        if (!this.state.loading) {
-            return null;
+    let list = [];
+    let path, extension;
+    comics.map(comic => {
+        if (comic.images[0] && "path" in comic.images[0]) {
+            path = comic.images[0].path;
+            extension = comic.images[0].extension;
+        } else if (comic.thumbnail && "path" in comic.thumbnail) {
+            path = comic.thumbnail.path;
+            extension = comic.thumbnail.extension;
         }
-        return <LoadSpinner />
-    }  
-
-    componentDidUpdate(prevProps) {
-        if (this.props.id !== prevProps.id) {
-            this.setState({
-                loading: true
-            })
-        }
-    }
-
-    render() {
-        if (this.props.comics.length == 0) {
-            return null
-        }
-        let row = [];
-        if (this.props.comics.length > 0) {
-            let comics = this.props.comics;
-            comics.map(comic => {
-                if (comic.images.length>0) {
-                    let thumbnail = 
-                        comic.images[0].path + '/portrait_fantastic.' + comic.images[0].extension;
-                    row.push(
-                        <div className="comic" key={comic.id}>                 
+        list.push(
+            <div className="comic" key={comic.id}> 
+                <ProgressiveImage
+                    src={`${path}/portrait_fantastic.${extension}`} 
+                    rootMargin="0% 0% 0%"
+                    threshold={[0.3]}
+                    placeholder="">
+                    {(src, loading) => {
+                        return loading ? placeholder : 
                             <img 
-                                src={thumbnail} 
-                                onLoad={this.handleImageChange}
-                                onError={this.handleImageChange} 
+                                src={src} 
+                                alt={comic.title} 
                             />
-                            <span>{comic.title}</span>
-                        </div>
-                    );
-                }
-            })
-        }
-        return (
-            <Fragment>
-                <h2>RELATED COMICS</h2>
-                <div id="comics_list" ref={element => {this.comicsElement = element}}>
-                    {this.renderSpinner()}
-                    <div id="center-comics-list">
-                        {row}
-                    </div>
-                </div>
-            </Fragment>
+                    }}
+                </ProgressiveImage>
+                <span>{comic.title}</span>
+            </div>
         )
-    }
+    })
+    return (
+        <div id="center-comics-list">
+            {list}
+        </div>
+    )
 }
+
+export default ComicRenderer;

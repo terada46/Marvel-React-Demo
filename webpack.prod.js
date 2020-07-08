@@ -1,15 +1,12 @@
 const path = require('path');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCssAssets = require('optimize-css-assets-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = merge(common, {
-    output: {
-        filename: 'main.js',
-        path: path.resolve(__dirname, 'dist')
-    },
     module: {
         rules: [
             {
@@ -35,19 +32,26 @@ module.exports = merge(common, {
         })
     ],
     optimization: {
+        minimize: true,
         minimizer: [
-            new UglifyJsPlugin({
+            new TerserPlugin({
+                test: /\.js(\?.*)?$/i,
                 cache: true,
                 parallel: true,
-                uglifyOptions: {
+                terserOptions: {
+                    compress: {
+                        drop_console: true,
+                    },
                     output: {
-                        comments: /@license/i
+                        comments: /@license/i,
                     }
-                }
+                },
+                extractComments: true,
             }),
             new OptimizeCssAssets({
                 cssProcessor: require('cssnano'),
-            })
+            }),
+            new CleanWebpackPlugin()
         ]
     }
 })

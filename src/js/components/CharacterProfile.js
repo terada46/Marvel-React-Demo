@@ -1,9 +1,14 @@
 import React, { Fragment, Component } from 'react';
-import { isImagesLoaded, LoadSpinner } from '../functions';
 import { charactersAPI, apikey, ts, hash } from '../constants';
+import ProgressiveImage from 'react-progressive-graceful-image';
+import { ProfileImageLoader, ProfileTextLoader } from './ImageLoader';
 import axios from 'axios';
+   
+const placeholder = (
+    <ProfileImageLoader />
+);
 
-//Get data about the selected character from MARVEL
+//Get profile the selected character
 
 class CharacterProfile extends Component {
     constructor(props) {
@@ -12,53 +17,41 @@ class CharacterProfile extends Component {
             hasError: false,
             loading: true,
             name: '',
+            imageUrl: '',
             description: '',
-            image: '',
-            wiki_url: ''
+            wikiUrl: ''
         }
     }
-    
-    handleImageChange = () => {
-        this.setState(() => ({
-            loading: !isImagesLoaded(this.profileElement)
-        }));
-    }
 
-    renderSpinner = () => {
-        if (!this.state.loading) {
-            return null;
-        }
-        return <LoadSpinner />
-    }
-
-    getCharacter = id => {
-        axios.get( charactersAPI, {
-            params: {
-                ts: ts,
-                apikey: apikey,
-                id: id, 
-                hash: hash
-            }
-        })
-        .then((response) => {
-            if (response.status === 200) {
-                const { name, description, thumbnail, urls } = response.data.data.results[0];
-                const image = thumbnail.path + '/portrait_fantastic.' + thumbnail.extension;
-                const wiki_url = urls[1].url;
-                this.setState(() =>({
-                    name: name,
-                    description: description,
-                    image: image,
-                    wiki_url: wiki_url
-                }));
-                if (!this.state.hasError) {
-                    this.setState(() => ({hasError: false}))
+    getCharacter = async (id) => {
+        this.setState({loading: true});
+        try {
+            const response = await axios.get( charactersAPI, {
+                params: {
+                    ts: ts,
+                    apikey: apikey,
+                    id: id, 
+                    hash: hash
                 }
+            });
+            if (response.status === 200) {
+                let { name, description, thumbnail, urls } = response.data.data.results[0];
+                let imageUrl = `${thumbnail.path}/portrait_fantastic.${thumbnail.extension}`;
+                let wikiUrl = urls[1].url;
+                this.setState({
+                    description: description,
+                    name: name,
+                    imageUrl: imageUrl,
+                    wikiUrl: wikiUrl,
+                    loading: false
+                });
             }
-        })
-        .catch(() => {
-            this.setState(() => ({hasError: true}))
-        })
+            if (this.state.hasError) {
+                this.setState({hasError: false})
+            }
+        } catch(error) {
+            this.setState({hasError: true})
+        }
     }
 
     componentDidMount() {
@@ -82,27 +75,36 @@ class CharacterProfile extends Component {
         return (
             <Fragment>
                 <h2>CHARACTER PFOFILE</h2>
-                <div id="character_prof" ref={element => {this.profileElement = element}}>
                     <div id="center-profile-content">
-                        {this.renderSpinner()}
-                        <div className="profile-img-container">
-                            <img src={this.state.image} 
-                                onLoad={this.handleImageChange}
-                                onError={this.handleImageChange} 
-                            />
-                        </div>
-                        <div id="profile">
-                            <h1>{this.state.name}</h1>
-                            <p>{this.state.description}</p>
-                            <p>Read More about {this.state.name} on&nbsp;
-                                <a target="_blank" 
-                                    href={this.state.wiki_url}>
-                                    Marvel Universe Wiki
-                                </a>.
-                            </p>
+                        <div id="profile-content-container">
+                            <div id="placeholder-container">
+                            {this.state.loading ? <ProfileImageLoader /> :
+                                <ProgressiveImage 
+                                    src={this.state.imageUrl} 
+                                    rootMargin="0% 0% 0%"
+                                    threshold={[1]}
+                                    placeholder="">
+                                    {(src, loading) => {
+                                        return loading ? placeholder : 
+                                        <img id="profile-img" src={src} alt="profile" />;
+                                    }}
+                                </ProgressiveImage>
+                            }
+                            </div>
+                            {this.state.loading ? <ProfileTextLoader /> :
+                                <div id="profile">
+                                    <h1>{this.state.name}</h1>
+                                    <p>{this.state.description}</p>
+                                    <p>Read More about {this.state.name} on&nbsp;
+                                        <a target="_blank" 
+                                            href={this.state.wikiUrl}>
+                                            Marvel Universe Wiki
+                                        </a>
+                                    </p>
+                                </div>
+                            } 
                         </div>
                     </div>
-                </div>
             </Fragment>
         )
     }
