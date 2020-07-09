@@ -72,11 +72,11 @@ export class ProfileTextLoader extends Component {
         backgroundColor="#f3f3f3"
         foregroundColor="#ecebeb"
       >
-        <rect x="22" y="0" rx="8" ry="8" width="104" height="41" /> 
-        <rect x="22" y="67" rx="8" ry="8" width="486" height="18" /> 
-        <rect x="22" y="108" rx="8" ry="8" width="486" height="18" /> 
-        <rect x="22" y="149" rx="8" ry="8" width="486" height="18" /> 
-        <rect x="22" y="190" rx="8" ry="8" width="292" height="18" />
+        <rect x="2" y="0" rx="8" ry="8" width="104" height="41" /> 
+        <rect x="2" y="67" rx="8" ry="8" width="486" height="18" /> 
+        <rect x="2" y="108" rx="8" ry="8" width="486" height="18" /> 
+        <rect x="2" y="149" rx="8" ry="8" width="486" height="18" /> 
+        <rect x="2" y="190" rx="8" ry="8" width="292" height="18" />
       </ContentLoader>
     )
   }
