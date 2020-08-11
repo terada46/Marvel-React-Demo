@@ -5,3 +5,5 @@
 `npm run start`  Start webpack dev server for development.
 
 `npm run build`  Build for production.
+
+Open `http://localhost:9000/` to view it in the browser.
