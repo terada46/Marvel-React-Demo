@@ -33,6 +33,7 @@ module.exports = merge(common, {
         watchContentBase: true,
         compress: true,
         open: true,
-        port: 9000
+        port: 9000,
+        disableHostCheck: true,
     }
 })
